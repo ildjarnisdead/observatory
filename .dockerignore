@@ -1,0 +1,24 @@
+.github
+.git
+.vscode
+.idea
+test
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
+.env
+conf/config.json
+api-examples.http
+.DS_Store
+.editorconfig
+.gitignore
+.prettierrc.json
+
+# Exclude Temporary and Log Files.
+# See: https://wiki.mozilla.org/GitHub/Repository_Security/GitHub_Workflows_%26_Actions#Docker_Security_Best_Practices
+*.log
+*.tmp
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
