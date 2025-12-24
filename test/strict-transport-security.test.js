@@ -2,7 +2,6 @@ import { assert } from "chai";
 import { emptyRequests } from "./helpers.js";
 import { strictTransportSecurityTest } from "../src/analyzer/tests/strict-transport-security.js";
 import { Expectation } from "../src/types.js";
-import { Site } from "../src/site.js";
 
 describe("Strict Transport Security", () => {
   /**
@@ -88,21 +87,21 @@ describe("Strict Transport Security", () => {
   });
 
   it("preloaded", function () {
-    reqs.site = Site.fromSiteString("bugzilla.mozilla.org");
+    reqs.hostname = "bugzilla.mozilla.org";
     let result = strictTransportSecurityTest(reqs);
     assert.equal(result.result, Expectation.HstsPreloaded);
     assert.isTrue(result.includeSubDomains);
     assert.isTrue(result.pass);
     assert.isTrue(result.preloaded);
 
-    reqs.site = Site.fromSiteString("facebook.com");
+    reqs.hostname = "facebook.com";
     result = strictTransportSecurityTest(reqs);
     assert.equal(result.result, Expectation.HstsPreloaded);
     assert.isFalse(result.includeSubDomains);
     assert.isTrue(result.pass);
     assert.isTrue(result.preloaded);
 
-    reqs.site = Site.fromSiteString("dropboxusercontent.com");
+    reqs.hostname = "dropboxusercontent.com";
     result = strictTransportSecurityTest(reqs);
     assert.equal(result.result, Expectation.HstsNotImplemented);
     assert.isFalse(result.includeSubDomains);

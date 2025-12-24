@@ -114,11 +114,6 @@ export function parseCsp(cspList) {
           // convenience variable pointing to previous entry in the combined list
           const prev = combinedSources[index - 1];
 
-          // Skip if either source or prev is undefined
-          if (!source || !prev) {
-            continue;
-          }
-
           // if it's from the same policy and they start with the same thing, the longer one is
           // superfluous, e.g. https://example.com/foo and https://example.com/foobar
           if (
@@ -196,14 +191,8 @@ function pathPartMatch(pathA, pathB) {
     pathListA.pop();
   }
   for (let i = 0; i < pathListA.length; i++) {
-    const pathAElement = pathListA[i];
-    const pathBElement = pathListB[i];
-    if (pathAElement === undefined || pathBElement === undefined) {
-      return false;
-    }
-
-    const pieceA = decodeURIComponent(pathAElement);
-    const pieceB = decodeURIComponent(pathBElement);
+    const pieceA = decodeURIComponent(pathListA[i]);
+    const pieceB = decodeURIComponent(pathListB[i]);
     if (pieceA !== pieceB) {
       return false;
     }

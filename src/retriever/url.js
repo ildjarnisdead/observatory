@@ -1,82 +1,27 @@
-import { SiteIsDownError } from "../api/errors.js";
-import { CONFIG } from "../config.js";
-import { Site } from "../site.js";
-import axios from "axios";
-
-/**
- * Detects if a port supports TLS by making simple test requests
- * @param {Site} site
- * @returns {Promise<boolean>} true if TLS is supported, false otherwise
- */
-export async function detectTlsSupport(site) {
-  const httpsUrl = `https://${site.hostname}:${site.port}${site.path ?? ""}`;
-  const httpUrl = `http://${site.hostname}:${site.port}${site.path ?? ""}`;
-
-  // Simple timeout and basic config for quick checks
-  const config = {
-    timeout: CONFIG.retriever.clientTimeout,
-    maxRedirects: 0,
-    validateStatus: (/** @type {number} */ status) => status < 500,
-  };
-
-  // Run both requests concurrently
-  const [httpsResult, httpResult] = await Promise.allSettled([
-    axios.head(httpsUrl, {
-      ...config,
-      httpsAgent: new (await import("https")).Agent({
-        rejectUnauthorized: false, // Accept self-signed certs for detection
-      }),
-    }),
-    axios.head(httpUrl, config),
-  ]);
-
-  // Check if HTTPS succeeded
-  if (httpsResult.status === "fulfilled") {
-    return true;
-  }
-
-  // Check if HTTP succeeded
-  if (httpResult.status === "fulfilled") {
-    return false;
-  }
-
-  // Both failed
-  throw new SiteIsDownError();
-}
-
 /**
  *
- * @param {Site} site
- * @param {import("../types.js").ScanOptions} [options]
+ * @param {string} hostname
+ * @param {import("../types.js").Options} [options]
  */
-export async function urls(site, options = {}) {
+export function urls(hostname, options = {}) {
   return {
-    http: await url(site, false, options),
-    https: await url(site, true, options),
+    http: url(hostname, false, options),
+    https: url(hostname, true, options),
   };
 }
 
 /**
  *
- * @param {Site} site
+ * @param {string} hostname
  * @param {boolean} [https]
- * @param {import("../types.js").ScanOptions} options
+ * @param {import("../types.js").Options} options
  * @returns
  */
-async function url(site, https = true, options = {}) {
-  let port = (https ? options.httpsPort : options.httpPort) ?? undefined;
-  if (site.port !== undefined) {
-    const isTlsSecured = await detectTlsSupport(site);
-    if (isTlsSecured && https) {
-      port = site.port;
-    }
-    if (!isTlsSecured && !https) {
-      port = site.port;
-    }
-  }
-  const portString = port === undefined ? "" : `:${port}`;
+function url(hostname, https = true, options = {}) {
+  let port = (https ? options.httpsPort : options.httpPort) ?? "";
+  port = port === "" ? "" : `:${port}`;
   const url = new URL(
-    `${https ? "https" : "http"}://${site.hostname}${portString}${site.path ?? ""}`
+    `${https ? "https" : "http"}://${hostname}${port}${options.path ?? ""}`
   );
   return url;
 }

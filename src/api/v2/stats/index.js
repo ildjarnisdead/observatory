@@ -7,11 +7,13 @@ import { SCHEMAS } from "../schemas.js";
  * @returns {Promise<void>}
  */
 export default async function (fastify) {
+  const pool = fastify.pg.pool;
+
   fastify.get(
     "/grade_distribution",
     { schema: SCHEMAS.gradeDistribution },
-    async (_request, _reply) => {
-      const res = await selectGradeDistribution(fastify.pg.pool);
+    async (request, reply) => {
+      const res = await selectGradeDistribution(pool);
       return res;
     }
   );

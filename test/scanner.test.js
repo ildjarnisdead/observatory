@@ -1,6 +1,5 @@
-import { assert } from "chai";
+import { assert, expect } from "chai";
 import { scan } from "../src/scanner/index.js";
-import { Site } from "../src/site.js";
 
 /** @typedef {import("../src/scanner/index.js").ScanResult} ScanResult */
 
@@ -11,9 +10,9 @@ describe("Scanner", () => {
         .fill(0)
         .map(() => String.fromCharCode(Math.random() * 26 + 97))
         .join("") + ".net";
-    const site = Site.fromSiteString(domain);
+
     try {
-      await scan(site);
+      const scanResult = await scan(domain);
       throw new Error("scan should throw");
     } catch (e) {
       if (e instanceof Error) {
@@ -26,12 +25,11 @@ describe("Scanner", () => {
 
   it("returns expected results on observatory.mozilla.org", async function () {
     const domain = "observatory.mozilla.org";
-    const site = Site.fromSiteString(domain);
-    const scanResult = await scan(site);
+    const scanResult = await scan(domain);
 
-    assert.equal(scanResult.scan.algorithmVersion, 5);
+    assert.equal(scanResult.scan.algorithmVersion, 4);
     assert.equal(scanResult.scan.grade, "A+");
-    assert.equal(scanResult.scan.score, 110);
+    assert.equal(scanResult.scan.score, 105);
     assert.equal(scanResult.scan.testsFailed, 0);
     assert.equal(scanResult.scan.testsPassed, 10);
     assert.equal(scanResult.scan.testsQuantity, 10);
@@ -41,9 +39,8 @@ describe("Scanner", () => {
 
   it("returns expected results on mozilla.org", async function () {
     const domain = "mozilla.org";
-    const site = Site.fromSiteString(domain);
-    const scanResult = await scan(site);
-    assert.equal(scanResult.scan.algorithmVersion, 5);
+    const scanResult = await scan(domain);
+    assert.equal(scanResult.scan.algorithmVersion, 4);
     assert.equal(scanResult.scan.grade, "B+");
     assert.equal(scanResult.scan.score, 80);
     assert.equal(scanResult.scan.testsFailed, 1);

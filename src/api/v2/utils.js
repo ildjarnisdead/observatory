@@ -93,7 +93,7 @@ export async function validHostname(hostname) {
   // Check if we can look up the host
   await /** @type {Promise<void>} */ (
     new Promise((resolve, reject) => {
-      dns.lookup(hostname, (err, _address, _family) => {
+      dns.lookup(hostname, (err, address, family) => {
         if (err) {
           reject(new InvalidHostNameLookupError(hostname));
         }
@@ -107,31 +107,25 @@ export async function validHostname(hostname) {
 
 /**
  *
- * @param {import("../../site.js").Site} site
- * @returns {Promise<import("../../site.js").Site>}
+ * @param {string} hostname
+ * @returns {Promise<string>}
  */
-export async function checkSitename(site) {
-  // first, divide the site string into its components: hostname, port (optional) and path (optional)
-  // then lowercase the hostname.
-  // look up the hostname
-  // if lookup fails, try again with "www." prefix
-  // finally, return the sanitized site string.
-
-  if (isIp(site.hostname)) {
+export async function checkHostname(hostname) {
+  if (isIp(hostname)) {
     throw new InvalidHostNameIpError();
   }
 
   // Try prefixing with `www.` if it fails on first try
   try {
-    site.hostname = await validHostname(site.hostname);
+    hostname = await validHostname(hostname);
   } catch (e) {
     if (e instanceof InvalidHostNameLookupError) {
-      site.hostname = await validHostname(`www.${site.hostname}`);
+      hostname = await validHostname(`www.${hostname}`);
     } else {
       throw e;
     }
   }
-  return site;
+  return hostname;
 }
 
 /**
@@ -186,6 +180,7 @@ function getTitle(name) {
 export async function historyForSite(pool, siteId) {
   const historyRows = await selectScanHostHistory(pool, siteId);
   const history = historyRows.map((h) => {
+    const id = h.id;
     return {
       id: h.id,
       grade: h.grade,
@@ -239,16 +234,16 @@ export function hydrateTests(tests) {
 /**
  *
  * @param {Pool} pool
- * @param {import("../../site.js").Site} site
+ * @param {string} hostname
  * @returns {Promise<import("../../database/repository.js").ScanRow>}
  */
-export async function executeScan(pool, site) {
-  const siteId = await ensureSite(pool, site.asSiteKey());
+export async function executeScan(pool, hostname) {
+  const siteId = await ensureSite(pool, hostname);
   let scanRow = await insertScan(pool, siteId);
   const scanId = scanRow.id;
   let scanResult;
   try {
-    scanResult = await scan(site);
+    scanResult = await scan(hostname);
   } catch (e) {
     if (e instanceof Error) {
       await updateScanState(pool, scanId, ScanState.FAILED, e.message);

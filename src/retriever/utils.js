@@ -4,10 +4,10 @@ import { CONTENT_SECURITY_POLICY, REFERRER_POLICY } from "../headers.js";
 /**
  *
  * @param {string} html
- * @param {string} _baseUrl
+ * @param {string} baseUrl
  * @returns {Map<string, string[]>}
  */
-export function parseHttpEquivHeaders(html, _baseUrl) {
+export function parseHttpEquivHeaders(html, baseUrl) {
   /** @type {Map<string, string[]>} */
   const httpEquivHeaders = new Map([[CONTENT_SECURITY_POLICY, []]]);
 

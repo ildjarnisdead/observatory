@@ -10,20 +10,23 @@ import { NUM_TESTS } from "../constants.js";
 import { ALL_TESTS } from "../constants.js";
 
 /**
+ * @typedef {Object} Options
+ */
+
+/**
  * @typedef {import("../types.js").ScanResult} ScanResult
  * @typedef {import("../types.js").Output} Output
  * @typedef {import("../types.js").StringMap} StringMap
  * @typedef {import("../types.js").TestMap} TestMap
- * @typedef {import("../site.js").Site} Site
  */
 
 /**
- * @param {Site} site
- * @param {import("../types.js").ScanOptions} [options]
+ * @param {string} hostname
+ * @param {Options} [options]
  * @returns {Promise<ScanResult>}
  */
-export async function scan(site, options) {
-  let r = await retrieve(site, options);
+export async function scan(hostname, options) {
+  let r = await retrieve(hostname);
   if (!r.responses.auto) {
     // We cannot connect at all, abort the test.
     throw new Error("The site seems to be down.");

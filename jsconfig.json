@@ -1,19 +1,11 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "checkJs": true,
-    "noEmit": true,
-    "target": "esnext",
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "target": "es2022",
     "maxNodeModuleJsDepth": 0,
-    "strict": true,
-    "skipLibCheck": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "strict": true
   },
   "exclude": ["node_modules"]
 }

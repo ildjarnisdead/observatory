@@ -6,7 +6,6 @@ import { Requests } from "../src/types.js";
 import { Session } from "../src/retriever/session.js";
 import path from "node:path";
 import { parseHttpEquivHeaders } from "../src/retriever/utils.js";
-import { Site } from "../src/site.js";
 
 /**
  *
@@ -26,7 +25,7 @@ export function setHeader(response, header, value) {
  * @returns {Requests}
  */
 export function emptyRequests(httpEquivFile = null) {
-  const req = new Requests(Site.fromSiteString("mozilla.org"));
+  const req = new Requests("mozilla.org");
 
   // Parse the HTML file for its own headers, if requested
   if (httpEquivFile) {

@@ -12,20 +12,17 @@ const ROBOTS_HEADERS = ["Accept: text/plain,*/*;q=0.8"];
 
 /**
  *
- * @param {import("../scanner/index.js").Site} site
- * @param {import("../types.js").ScanOptions} options
+ * @param {*} hostname
+ * @param {import("../types.js").Options} options
  * @returns {Promise<Requests>}
  */
-export async function retrieve(site, options = {}) {
-  const retrievals = new Requests(site);
-  const { http: httpUrl, https: httpsUrl } = await urls(site, options);
+export async function retrieve(hostname, options = {}) {
+  const retrievals = new Requests(hostname);
 
+  const { http, https } = urls(hostname, options);
   const [httpSession, httpsSession] = await Promise.all([
-    Session.fromUrl(httpUrl, { headers: STANDARD_HEADERS, ...options.headers }),
-    Session.fromUrl(httpsUrl, {
-      headers: STANDARD_HEADERS,
-      ...options.headers,
-    }),
+    Session.fromUrl(http, { headers: STANDARD_HEADERS, ...options }),
+    Session.fromUrl(https, { headers: STANDARD_HEADERS, ...options }),
   ]);
 
   if (!httpSession && !httpsSession) {
@@ -51,7 +48,6 @@ export async function retrieve(site, options = {}) {
   retrievals.resources.path = getPageText(retrievals.responses.auto, true);
 
   // Get robots.txt to gather additional cookies, if any.
-  // robots.txt has to live at the root of the server, hence the leading slash
   await retrievals.session?.get({
     path: "/robots.txt",
     headers: new AxiosHeaders(ROBOTS_HEADERS.join("\n")),
@@ -63,7 +59,7 @@ export async function retrieve(site, options = {}) {
   ]
     ? retrievals.session.redirectHistory[
         retrievals.session.redirectHistory.length - 1
-      ]?.url.href
+      ].url.href
     : retrievals.session.url.href;
   const cors_resp =
     (await retrievals.session?.options({

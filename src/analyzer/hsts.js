@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Site } from "../site.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -31,12 +30,11 @@ export function hsts() {
 
 /**
  *
- * @param {Site} site
+ * @param {string} hostname
  * @returns {import("../types.js").Hst | null}
  */
-export function isHstsPreloaded(site) {
+export function isHstsPreloaded(hostname) {
   const h = hsts();
-  const hostname = site.hostname;
 
   // Check if the hostname is in the HSTS list with the right mode
   const existing = h.get(hostname);
@@ -46,6 +44,7 @@ export function isHstsPreloaded(site) {
 
   // Either the hostname is in the list *or* the TLD is and includeSubDomains is true
   const hostParts = hostname.split(".");
+  const levels = hostParts.length;
 
   // If hostname is foo.bar.baz.mozilla.org, check bar.baz.mozilla.org,
   // baz.mozilla.org, mozilla.org, and.org
