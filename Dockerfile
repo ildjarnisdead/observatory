@@ -1,18 +1,19 @@
 FROM node:20
 
 RUN apt-get -y update && \
-  apt-get install -y git libpq-dev && \
+  apt-get install -y git && \
   mkdir -p /home/node/app/node_modules && \
   chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
 USER node
 COPY --chown=node:node . .
-# This also installs hsts and tld data files in a postinstall script:
 RUN npm install
 
 ARG GIT_SHA=dev
 ARG RUN_ID=unknown
+# Get the current HSTS list
+RUN npm run updateHsts
 
 RUN env
 
