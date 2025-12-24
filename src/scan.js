@@ -11,9 +11,13 @@ program
   .description("CLI for the MDN HTTP Observatory scan functionality")
   .version("1.0.0")
   .argument("<hostname>", "hostname to scan")
+  .option('-h, --httpsPort <port>', 'Optional HTTPS port', '443')
+  .option('-t, --httpPort <port>', 'Optional HTTP port', '80')
+  .option('-p, --path <path>', 'Optional path', '/')
+  .parse(process.argv)
   .action(async (hostname, _options) => {
     try {
-      const result = await scan(hostname);
+      const result = await scan(hostname, _options);
       const tests = Object.fromEntries(
         Object.entries(result.tests).map(([key, test]) => {
           const { scoreDescription, ...rest } = test;
